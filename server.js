@@ -1,8 +1,9 @@
 const express = require('express');
-const db = require('./db/db.json')
-const path = require('path');
 const fs = require('fs');
-const { notStrictEqual } = require('assert');
+const db = require('./db/db.json');
+const path = require('path');
+const router = require('express').Router();
+const storage = require('./db/storage')
 
 // initiates server
 const app = express();
@@ -14,9 +15,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static('public'));
 
-function queryFilter(query, dbArray) {
-    let filteredResults = dbArray;
-    if (query,noteTitle) {
+function queryFilter(query, db) {
+    let filteredResults = db;
+    if (query.noteTitle) {
         filteredResults = filteredResults.filter(
             (db) => (db.noteTitle = query.noteTitle)
         );
@@ -27,33 +28,39 @@ function queryFilter(query, dbArray) {
     return filteredResults;
 }
 
-function findById(id, dbArray) {
-    const result = dbArray.filter((db) => db.id === id)[0];
+function findById(id, db) {
+    const result = db.filter((db) => db.id === id)[0];
     return result;
 }
 
-function createNewNote(bodu, dbArray) {
-    const note = body;
-    dbArray.push(note);
+function createNewNote(body, db) {
+    db.push(body);
     fs.writeFileSync(
-        path.join(__dirname, './db/db.son'),
-        JSON.stringify({ db: dbArray }, null, 2)
+        path.join(__dirname, './db/db.json'),
+        JSON.stringify(body, null, 2)
     );
     return body;
 }
 
-app.get('/api/notes', (req, res) => {
-    let results = db;
-    if (req.query) {
-        results = filterByQuery(req.query, results);
+function validateNote(note) {
+    if (!db.title || typeof db.title !== 'string') {
+        return false;
     }
-});
 
-app.post('/api/notes', (req, res) => {
-    req.body.id = db.length.toString();
-    const note = createNewNote(req.body, db);
-    res.json(req.body);
-})
+    if (!db.text || typeof db.text !== 'string') {
+        return false;
+    }
+    return true;
+}
+
+router.get('/notes', (req, res) => {
+    storage
+        .getNotes()
+        .then((notes) => {
+            return res.join(notes);
+        })
+        .catch((err) => res.status(500).json(err));
+});
 
 app.get('/api/notes/:id', (req, res) => {
     const result = findById(req.params.id, db);
@@ -72,13 +79,19 @@ app.get('/notes',(req, res) => {
     res.sendFile(path.join(__dirname, './public/notes.html'));
 });
 
-app.delete('/api/notes/:id', (req, res) => {
-    const deleteNote = db.params.id;
-    if (deleteNote === -1)
-    return res.status(404).json({});
-    notes.splice(deleteNote, 1);
-    res.join(notes);
+router.post('/notes', (req, res) => {
+    storage
+        .addNote(req.body)
+        .then((note) => res.json(note))
+        .catch((err) => res.status(500).json(err));
 })
+
+router.delete('/notes/:id', (req, res) => {
+    storage
+        .removeNote(req.params.id)
+        .then(() => res.json({ ok: true }))
+        .catch((err) => res.status(500).json(err));
+});
 
 app.get('/index', (req, res) => {
     res.sendFile(path.join(__dirname, './public/index.html'));
