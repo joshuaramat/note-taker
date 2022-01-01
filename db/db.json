@@ -1,13 +1,6 @@
 [
-  [
-    {
-      "title": "Test Title",
-      "text": "Test text"
-    }
-  ],
   {
-    "title": "test 2",
-    "text": "test body 2",
-    "id": "1"
+    "title": "Read me first!",
+    "text": "Welcome to the notepad, to start, simply click on the note title to create a new note and type away!"
   }
 ]
