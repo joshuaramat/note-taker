@@ -60,7 +60,7 @@ app.get('/api/notes/:id', (req, res) => {
     if (result) {
         res.json(result);
     } else {
-        res.send(404);
+        res.sendStatus(404);
     }
 });
 
