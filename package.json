@@ -10,7 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.16.4",
-    "mysql2": "^2.3.3",
+    "heroku": "^7.59.2",
     "path": "^0.12.7"
   }
 }
