@@ -5,8 +5,6 @@ const path = require('path');
 
 // initiates server
 const app = express();
-
-// set up for dynamic PORT
 const PORT = process.env.PORT || 3001
 
 app.use(express.urlencoded({ extended: true }));
@@ -33,15 +31,10 @@ function findById(id, db) {
 
 function createNewNote(body, db) {
     db.push(body);
-    console.log('body in console', body);
-    console.log('db in console'), db
     fs.writeFileSync(
         path.join(__dirname, './db/db.json'),
         JSON.stringify(db, null, 2)
     );
-    console.log('writeFile successful');
-    console.log('db stringified successfully', db);
-
     return db;
 }
 
@@ -50,8 +43,7 @@ app.get('/api/notes', (req, res) => {
     if(req.query) {
         results = queryFilter(req.query, results);
     }
-    console.log('query', req.query);
-    console.log('results', results);
+
     res.json(results);
 });
 
@@ -66,12 +58,9 @@ app.get('/api/notes/:id', (req, res) => {
 
 app.post('/api/notes', (req, res) => {
     req.body.id = db.length.toString();
-    const dbArray = [db];
+    const dbArray = db;
     const note = createNewNote(req.body, dbArray);
     res.json(note);
-    console.log('dbArray in api route', dbArray);
-    console.log('req.body in api route', req.body);
-    console.log('note in api route', note);
 });
 
 // root routes
