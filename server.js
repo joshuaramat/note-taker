@@ -1,11 +1,12 @@
 const express = require('express');
 const fs = require('fs');
 const db = require('./db/db.json');
+const util = require('util');
 const path = require('path');
 
 // initiates server
 const app = express();
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || 3001;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -61,6 +62,10 @@ app.post('/api/notes', (req, res) => {
     const dbArray = db;
     const note = createNewNote(req.body, dbArray);
     res.json(note);
+});
+
+app.delete('/api/notes/:id', (req, res) => {
+    console.log(req.params.id);
 });
 
 // root routes
