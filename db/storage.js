@@ -1,4 +1,5 @@
 const fs = require('fs');
+const util = require('util');
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
 
@@ -25,7 +26,7 @@ class Storage {
         }))
     }
 
-    addNote(note) {
+    async addNote(note) {
         const { title, text } = note;
         if (!title || !text) {
             throw new Error("Note 'title' and 'text' cannot be blank");
@@ -33,16 +34,16 @@ class Storage {
 
         const newNote = { title, text, id: uuidv1() };
 
-        return this.getNotes()
-            .then((notes) => [...notes, newNote])
-            .then((updatedNotes) => this.write(updatedNotes))
-            .then(() => newNote);
+        const notes = await this.getNotes();
+        const updatedNotes = [...notes, newNote];
+        await this.write(updatedNotes);
+        return newNote;
     }
 
-    removeNote(id) {
-        return this.getNotes()
-            .then((notes) => notes.filter((note) => note.id !== id))
-            .then((filteredNotes) => this.write(filteredNotes));
+    async removeNote(id) {
+        const notes = await this.getNotes();
+        const filteredNotes = notes.filter((note) => note.id !== id);
+        return await this.write(filteredNotes);
     }
 }
 
